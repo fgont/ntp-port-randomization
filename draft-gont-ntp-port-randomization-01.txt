@@ -73,13 +73,13 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
    3.  Update to RFC5905 . . . . . . . . . . . . . . . . . . . . . .   3
-   4.  Implementation Status . . . . . . . . . . . . . . . . . . . .   3
+   4.  Implementation Status . . . . . . . . . . . . . . . . . . . .   4
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   4
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .   4
-   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   4
+   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   5
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   5
      8.1.  Normative References  . . . . . . . . . . . . . . . . . .   5
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .   5
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .   6
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   6
 
 1.  Introduction
@@ -103,9 +103,9 @@ Table of Contents
    use of a service/well-known port is not required, employing such
    well-known/service port improves the ability of an attacker to
    perform blind/off-path attacks (since knowledge of such port number
-   is typically required for such attacks).  This document formally
-   updates RFC5905, recommending the use of port randomization for those
-   modes where use of the NTP service port is not required.
+   is typically required for such attacks).  Recent measurements on the
+   port numbers employed by NTP peers [NIST-NTP] suggest that a
+   considerable number of NTP peers employ the NTP service/well-known
 
 
 
@@ -113,6 +113,14 @@ Gont & Gont             Expires October 27, 2019                [Page 2]
 
 Internet-Draft           NTP Port Randomization               April 2019
 
+
+   port as their local port, or select predictable ephemeral port
+   numbers, thus improving the ability of attackers to perform blind/
+   off-path attacks against NTP.
+
+   This document formally updates [RFC5905], recommending the use of
+   port randomization for those modes where use of the NTP service port
+   is not required.
 
 2.  Terminology
 
@@ -140,11 +148,27 @@ Internet-Draft           NTP Port Randomization               April 2019
    The value in this variable becomes the source port number in packets
    sent from this association.
 
-   NOTE:
+   NOTES:
       The port number is to be randomized on a per-association basis.
       That is, a random port number is selected when an association is
       first mobilized, and the selected port number is expected to
-      remain constant during the life of an association.  This
+      remain constant during the life of an association.
+
+      On most current operating systems (that implement ephemeral port
+      randomization [RFC6056]), an NTP peer may normally rely on the
+      operating system for performing port randomization.  For example,
+      NTP implementations employing the Sockets API may achieve port
+      randomization by *not* specifying the local port for the
+      corresponding socket, or bind()ing the local socket to the
+      "special" port 0 (which for the Sockets API has the special
+      meaning of "any port").
+
+
+
+Gont & Gont             Expires October 27, 2019                [Page 3]
+
+Internet-Draft           NTP Port Randomization               April 2019
+
 
 4.  Implementation Status
 
@@ -161,15 +185,6 @@ Internet-Draft           NTP Port Randomization               April 2019
    has been spent to verify the information presented here that was
    supplied by IETF contributors.  This is not intended as, and must not
    be construed to be, a catalog of available implementations or their
-
-
-
-
-Gont & Gont             Expires October 27, 2019                [Page 3]
-
-Internet-Draft           NTP Port Randomization               April 2019
-
-
    features.  Readers are advised to note that other implementations may
    exist.
 
@@ -182,7 +197,15 @@ Internet-Draft           NTP Port Randomization               April 2019
       port randomization for client ports.
 
    chrony:
-      [chrony] [TBD].
+      [chrony] has never explictly set the local port of NTP clients,
+      and thus employs the ephemeral port selection algorithm
+      implemented by the operating system.  Thus, on all operating
+      systems that implement port randomization (such as current
+      versions of OpenBSD, Linux, and FreeBSD), chrony will employ port
+      randomization for client ports.
+
+   sntpd:
+      [TBD].
 
 5.  IANA Considerations
 
@@ -195,6 +218,14 @@ Internet-Draft           NTP Port Randomization               April 2019
    The security implications of predictable numeric identifiers
    [I-D.gont-predictable-numeric-ids] (and of predictable transport-
    protocol port numbers [RFC6056] in particular) have been known for a
+
+
+
+Gont & Gont             Expires October 27, 2019                [Page 4]
+
+Internet-Draft           NTP Port Randomization               April 2019
+
+
    long time now.  However, the NTP specification have traditionally
    followed a pattern of employing common settings and code even when
    not strictly necessary, which at times has resulted in negative
@@ -216,15 +247,6 @@ Internet-Draft           NTP Port Randomization               April 2019
    The authors would like to thank (in alphabetical order) Miroslav
    Lichvar, and Steven Sommars, for providing valuable comments on
    earlier versions of this document.
-
-
-
-
-
-Gont & Gont             Expires October 27, 2019                [Page 4]
-
-Internet-Draft           NTP Port Randomization               April 2019
-
 
    Fernando would like to thank Nelida Garcia and Jorge Oscar Gont, for
    their love and support.
@@ -248,6 +270,18 @@ Internet-Draft           NTP Port Randomization               April 2019
               DOI 10.17487/RFC6056, January 2011,
               <https://www.rfc-editor.org/info/rfc6056>.
 
+
+
+
+
+
+
+
+Gont & Gont             Expires October 27, 2019                [Page 5]
+
+Internet-Draft           NTP Port Randomization               April 2019
+
+
 8.2.  Informative References
 
    [chrony]   "chrony", <https://chrony.tuxfamily.org/>.
@@ -263,6 +297,12 @@ Internet-Draft           NTP Port Randomization               April 2019
               Minimization", draft-ietf-ntp-data-minimization-04 (work
               in progress), March 2019.
 
+   [NIST-NTP]
+              Sherman, J. and J. Levine, "Usage Analysis of the NIST
+              Internet Time Service", Journal of Research of the
+              National Institute of Standards and Technology Volume 121,
+              March 2016, <https://tf.nist.gov/general/pdf/2818.pdf>.
+
    [NTP-VULN]
               Network Time Foundation, "Security Notice", Network Time
               Foundation's NTP Support Wiki ,
@@ -270,17 +310,6 @@ Internet-Draft           NTP Port Randomization               April 2019
 
    [OpenNTPD]
               "OpenNTPD Project", <https://www.openntpd.org>.
-
-
-
-
-
-
-
-Gont & Gont             Expires October 27, 2019                [Page 5]
-
-Internet-Draft           NTP Port Randomization               April 2019
-
 
    [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
               Code: The Implementation Status Section", BCP 205,
@@ -298,6 +327,15 @@ Authors' Addresses
    Phone: +54 11 4650 8472
    Email: fgont@si6networks.com
    URI:   http://www.si6networks.com
+
+
+
+
+
+
+Gont & Gont             Expires October 27, 2019                [Page 6]
+
+Internet-Draft           NTP Port Randomization               April 2019
 
 
    Guillermo Gont
@@ -333,4 +371,22 @@ Authors' Addresses
 
 
 
-Gont & Gont             Expires October 27, 2019                [Page 6]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gont & Gont             Expires October 27, 2019                [Page 7]

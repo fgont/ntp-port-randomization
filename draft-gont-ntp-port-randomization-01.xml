@@ -81,7 +81,9 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
     <section anchor="intro" title="Introduction">
 <t>The Network Time Protocol (NTP) is one of the oldest Internet protocols, and currently specified in <xref target="RFC5905"/>. Since its its original implementation, standardization and deployment, a number of vulnerabilities have been found both in the NTP specification and in some of its implementations <xref target="NTP-VULN"/>. Some of these vulnerabilities allow for off-path/blind attacks, where an attacker can send forged packets to one or both NTP peers for achieving Denial of Service (DoS), time-shifts, and other undesirable outcomes. Many of these attacks require the attacker to guess or know at least a target association, typically identified by the tuple {srcaddr, srcport, dstaddr, dstport, keyid}. Some of these parameters may be easily known or guessed.</t>
 
-      <t>NTP can operate in several modes. Some of these modes rely on the ability to receive unsolicited packets, and therefore require the use of a service/well-known port number. However, for modes where the use of a service/well-known port is not required, employing such well-known/service port improves the ability of an attacker to perform blind/off-path attacks (since knowledge of such port number is typically required for such attacks). This document formally updates RFC5905, recommending the use of port randomization for those modes where use of the NTP service port is not required.</t>
+      <t>NTP can operate in several modes. Some of these modes rely on the ability to receive unsolicited packets, and therefore require the use of a service/well-known port number. However, for modes where the use of a service/well-known port is not required, employing such well-known/service port improves the ability of an attacker to perform blind/off-path attacks (since knowledge of such port number is typically required for such attacks). Recent measurements on the port numbers employed by NTP peers <xref target="NIST-NTP"/> suggest that a considerable number of NTP peers employ the NTP service/well-known port as their local port, or select predictable ephemeral port numbers, thus improving the ability of attackers to perform blind/off-path attacks against NTP.</t>
+
+<t>This document formally updates <xref target="RFC5905"/>, recommending the use of port randomization for those modes where use of the NTP service port is not required.</t>
 </section>
 
 	<section title="Terminology" anchor="term">
@@ -110,16 +112,15 @@ srcport: UDP port number of the server or reference clock.  This
 <t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it must contain the NTP port number PORT (123) assigned by the IANA.  In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number in packets sent from this association.
 </t>
 
-
 <t>
 <list style="hanging">
-<t hangText="NOTE:">
-<vspace blankLines="0" />The port number is to be randomized on a per-association basis. That is, a random port number is selected when an association is first mobilized, and the selected port number is expected to remain constant during the life of an association. This
+<t hangText="NOTES:">
+<vspace blankLines="0" />The port number is to be randomized on a per-association basis. That is, a random port number is selected when an association is first mobilized, and the selected port number is expected to remain constant during the life of an association. 
+</t>
+<t>On most current operating systems (that implement ephemeral port randomization <xref target="RFC6056"/>), an NTP peer may normally rely on the operating system for performing port randomization. For example, NTP implementations employing the Sockets API may achieve port randomization by *not* specifying the local port for the corresponding socket, or bind()ing the local socket to the &quot;special&quot; port 0 (which for the Sockets API has the special meaning of &quot;any port&quot;).
 </t>
 </list>
 </t>
-
-
       </section>
 
       <section title="Implementation Status" anchor="implementation">
@@ -146,7 +147,10 @@ srcport: UDP port number of the server or reference clock.  This
 <vspace blankLines="0" /><xref target="OpenNTPD"/> has never explictly set the local port of NTP clients, and thus employs the ephemeral port selection algorithm implemented by the operating system. Thus, on all operating systems that implement port randomization (such as current versions of OpenBSD, Linux, and FreeBSD), OpenNTPD will employ port randomization for client ports.
 </t>
 <t hangText="chrony:">
-<vspace blankLines="0" /><xref target="chrony"/> [TBD].
+<vspace blankLines="0" /><xref target="chrony"/> has never explictly set the local port of NTP clients, and thus employs the ephemeral port selection algorithm implemented by the operating system. Thus, on all operating systems that implement port randomization (such as current versions of OpenBSD, Linux, and FreeBSD), chrony will employ port randomization for client ports.
+</t>
+<t hangText="sntpd:">
+<vspace blankLines="0" />[TBD].
 </t>
 </list>
 </t>
@@ -190,6 +194,25 @@ srcport: UDP port number of the server or reference clock.  This
 	<?rfc include="reference.RFC.7942" ?>
 	<?rfc include="reference.I-D.ietf-ntp-data-minimization" ?>
 	<?rfc include="reference.I-D.gont-predictable-numeric-ids" ?>
+
+
+
+	<reference anchor="NIST-NTP" target="https://tf.nist.gov/general/pdf/2818.pdf">
+		<front>
+			<title>Usage Analysis of the NIST Internet Time Service</title>
+
+
+			<author initials="J.A." surname="Sherman" fullname="Jeff A. Sherman">
+				<organization></organization>
+			</author>
+
+			<author initials="J." surname="Levine" fullname="Judah Levine">
+				<organization></organization>
+			</author>
+			<date year="2016" month="March" day="8"/>
+		</front>
+		<seriesInfo name="Journal of Research of the National Institute of Standards and Technology" value="Volume 121" />
+	</reference>
 
 	<reference anchor="NTP-VULN" target="https://support.ntp.org/bin/view/Main/SecurityNotice">
 		<front>
