@@ -5,8 +5,8 @@
 Network Time Protocol (ntp) Working Group                        F. Gont
 Internet-Draft                                                   G. Gont
 Obsoletes: rfc5905 (if approved)                            SI6 Networks
-Intended status: Standards Track                          April 24, 2019
-Expires: October 26, 2019
+Intended status: Standards Track                          April 25, 2019
+Expires: October 27, 2019
 
 
        Port Randomization in the Network Time Protocol Version 4
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on October 26, 2019.
+   This Internet-Draft will expire on October 27, 2019.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Gont & Gont             Expires October 26, 2019                [Page 1]
+Gont & Gont             Expires October 27, 2019                [Page 1]
 
 Internet-Draft           NTP Port Randomization               April 2019
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Gont & Gont             Expires October 26, 2019                [Page 2]
+Gont & Gont             Expires October 27, 2019                [Page 2]
 
 Internet-Draft           NTP Port Randomization               April 2019
 
@@ -165,7 +165,7 @@ Internet-Draft           NTP Port Randomization               April 2019
 
 
 
-Gont & Gont             Expires October 26, 2019                [Page 3]
+Gont & Gont             Expires October 27, 2019                [Page 3]
 
 Internet-Draft           NTP Port Randomization               April 2019
 
@@ -221,7 +221,7 @@ Internet-Draft           NTP Port Randomization               April 2019
 
 
 
-Gont & Gont             Expires October 26, 2019                [Page 4]
+Gont & Gont             Expires October 27, 2019                [Page 4]
 
 Internet-Draft           NTP Port Randomization               April 2019
 
@@ -277,7 +277,7 @@ Internet-Draft           NTP Port Randomization               April 2019
 
 
 
-Gont & Gont             Expires October 26, 2019                [Page 5]
+Gont & Gont             Expires October 27, 2019                [Page 5]
 
 Internet-Draft           NTP Port Randomization               April 2019
 
@@ -333,4 +333,4 @@ Authors' Addresses
 
 
 
-Gont & Gont             Expires October 26, 2019                [Page 6]
+Gont & Gont             Expires October 27, 2019                [Page 6]
