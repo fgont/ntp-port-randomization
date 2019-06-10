@@ -364,9 +364,9 @@ Internet-Draft           NTP Port Randomization                June 2019
    different paths in scenarios where ECMP is employed.
 
    The authors would like to thank (in alphabetical order) Ivan Arce,
-   Thomas Glassey, Watson Ladd, Miroslav Lichvar, Gary E.  Miller,
-   Steven Sommars, and Ulrich Windl, for providing valuable comments on
-   earlier versions of this document.
+   Todd Glassey, Watson Ladd, Miroslav Lichvar, Gary E.  Miller, Steven
+   Sommars, and Ulrich Windl, for providing valuable comments on earlier
+   versions of this document.
 
    The authors would like to thank Harlan Stenn for answering questions
    about nwtime.org's NTP implementation.

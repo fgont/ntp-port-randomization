@@ -218,7 +218,7 @@ srcport: UDP port number of the server or reference clock.  This
 
 <t>Miroslav Lichvar suggested randomization of the client port on a per-request basis, to intentionally cause each request/response to employ different paths in scenarios where ECMP is employed.</t>
 
-<t>The authors would like to thank (in alphabetical order) Ivan Arce, Thomas Glassey, Watson Ladd, Miroslav Lichvar, Gary E. Miller, Steven Sommars, and Ulrich Windl, for providing valuable comments on earlier versions of this document.</t>
+<t>The authors would like to thank (in alphabetical order) Ivan Arce, Todd Glassey, Watson Ladd, Miroslav Lichvar, Gary E. Miller, Steven Sommars, and Ulrich Windl, for providing valuable comments on earlier versions of this document.</t>
 
 
 
