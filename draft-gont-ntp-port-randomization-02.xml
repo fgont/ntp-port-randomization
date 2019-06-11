@@ -145,13 +145,14 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <t>The specification of the &quot;srcport&quot; and &quot;dstport&quot; peer process variables from Section 9.1 (&quot;Peer Process Variables&quot;) of <xref target="RFC5905"/> is updated as follows:
 </t>
 
-<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it must contain the NTP port number PORT (123) assigned by the IANA.  In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number in packets sent from this association.
+<t>dstport: UDP port number of the client. This becomes the source port number in packets sent from this association. In the symmetric modes (1 and 2), it is ordinarily the NTP port number PORT (123) assigned by the IANA. In the client mode, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/> and the port SHOULD not receive packets from other hosts than the server.
 </t>
 
 <t>
 <list style="hanging">
 <t hangText="NOTES:">
 <vspace blankLines="0" />On most current operating systems (that implement ephemeral port randomization <xref target="RFC6056"/>), an NTP client may normally rely on the operating system for performing port randomization. For example, NTP implementations employing the Sockets API may achieve port randomization by *not* specifying the local port for the corresponding socket, or bind()ing the local socket to the &quot;special&quot; port 0 (which for the Sockets API has the special meaning of &quot;any port&quot;).
+Connecting the socket with connect() will make the port inaccessible by other hosts.
 </t>
 
 <t>A port number might be randomized on a per-association basis, or on a per-request basis. When the port number is randomized on a per-association basis, a random port number is selected when an association is first mobilized, and the selected port remains constant during the life of the association. On the other hand, when the port number is randomized on a per-request basis, each client request will (statistically) employ a different ephemeral port for each request. As noted in <xref target="path-selection"/>, in some scenarios the selected ephemeral port may have an influence on the path employed by the associated packets, and these considerations may affect the decision of whether to randomize the port number on a per-association vs. per-request basis. 
