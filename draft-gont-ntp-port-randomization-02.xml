@@ -157,6 +157,9 @@ Connecting the socket with connect() will make the port inaccessible by other ho
 
 <t>A port number might be randomized on a per-association basis, or on a per-request basis. When the port number is randomized on a per-association basis, a random port number is selected when an association is first mobilized, and the selected port remains constant during the life of the association. On the other hand, when the port number is randomized on a per-request basis, each client request will (statistically) employ a different ephemeral port for each request. As noted in <xref target="path-selection"/>, in some scenarios the selected ephemeral port may have an influence on the path employed by the associated packets, and these considerations may affect the decision of whether to randomize the port number on a per-association vs. per-request basis. 
 </t>
+
+<t>If the port is randomized on a per-request basis, it SHOULD stay open for at least 4 seconds if no valid response is received from the server in order to prevent the client from sending an ICMP response when the NTP request or response is delayed in the network.
+</t>
 </list>
 </t>
       </section>
