@@ -120,7 +120,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <t>This might mean, for example, that two systems that synchronize their clocks with the same NTP server might end up with a significant offset between their clocks as a result of their NTP samples taking paths with very different characteristics.</t>
 
 
-<t>If port randomization is applied for every NTP request, requests/responses would be distributed over the different available paths, including those with the smallest delay. The clock filter algorithm could thus readily select one of such samples with lowest details, in the same way that the clock select and clock cluster algorithms might also end up selecting other time sources with smaller resulting dispersion.
+<t>If port randomization is applied for every NTP request, requests/responses will be distributed over the different available paths, including those with the shortest delay, which will be preferred by the clock filter algorithm.
 </t>
 
 </section>
