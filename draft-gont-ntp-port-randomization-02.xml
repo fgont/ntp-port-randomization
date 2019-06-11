@@ -79,9 +79,9 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
   </front>
   <middle>
     <section anchor="intro" title="Introduction">
-<t>The Network Time Protocol (NTP) is one of the oldest Internet protocols, and currently specified in <xref target="RFC5905"/>. Since its its original implementation, standardization and deployment, a number of vulnerabilities have been found both in the NTP specification and in some of its implementations <xref target="NTP-VULN"/>. Some of these vulnerabilities allow for off-path/blind attacks, where an attacker can send forged packets to one or both NTP peers for achieving Denial of Service (DoS), time-shifts, and other undesirable outcomes. Many of these attacks require the attacker to guess or know at least a target association, typically identified by the tuple {srcaddr, srcport, dstaddr, dstport, keyid}. Some of these parameters may be easily known or guessed.</t>
+<t>The Network Time Protocol (NTP) is one of the oldest Internet protocols, and currently specified in <xref target="RFC5905"/>. Since its original implementation, standardization and deployment, a number of vulnerabilities have been found both in the NTP specification and in some of its implementations <xref target="NTP-VULN"/>. Some of these vulnerabilities allow for off-path/blind attacks, where an attacker can send forged packets to one or both NTP peers for achieving Denial of Service (DoS), time-shifts, and other undesirable outcomes. Many of these attacks require the attacker to guess or know at least a target association, typically identified by the tuple {srcaddr, srcport, dstaddr, dstport, keyid}. Some of these parameters may be easily known or guessed.</t>
 
-      <t>NTP can operate in several modes. Some of these modes rely on the ability to receive unsolicited packets, and therefore require the use of a service/well-known port number. However, for modes where the use of a service/well-known port is not required, employing such well-known/service port improves the ability of an attacker to perform blind/off-path attacks (since knowledge of such port number is typically required for such attacks). A recent study <xref target="NIST-NTP"/> that analyzes the port numbers employed by NTP peers suggests that a considerable number of NTP peers employ the NTP service/well-known port as their local port, or select predictable ephemeral port numbers, thus improving the ability of attackers to perform blind/off-path attacks against NTP.</t>
+      <t>NTP can operate in several modes. Some of these modes rely on the ability to receive unsolicited packets, and therefore require the use of a service/well-known port number. However, for modes where the use of a service/well-known port is not required, employing such well-known/service port improves the ability of an attacker to perform blind/off-path attacks (since knowledge of such port number is typically required for such attacks). A recent study <xref target="NIST-NTP"/> that analyzes the port numbers employed by NTP clients suggests that a considerable number of clients employ the NTP service/well-known port as their local port, or select predictable ephemeral port numbers, thus improving the ability of attackers to perform blind/off-path attacks against NTP.</t>
 
 <t>BCP 156 <xref target="RFC6056"/> already recommends the randomization of transport-protocol ephemeral ports, and thus this document formally updates <xref target="RFC5905"/> such that port randomization is employed for those NTP modes for which the use of the NTP service port is not required. This document aligns NTP with the current advice on ephemeral port selection (port randomization).</t>
 </section>
@@ -120,7 +120,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <t>This might mean, for example, that two systems that synchronize their clocks with the same NTP server might end up with a significant offset between their clocks as a result of their NTP samples taking paths with very different characteristics.</t>
 
 
-<t>If port randomization is applied for every NTP request, requests/responses would be distributed over the different available paths, including those with the smallest delay. The clock filter algorithm could thus readily select one of such samples with lowest details, in the same way that the clock select and clock cluster algorithms might also end up selecting other time sources with smaller resulting dispersion.
+<t>If port randomization is applied for every NTP request, requests/responses will be distributed over the different available paths, including those with the shortest delay, which will be preferred by the clock filter algorithm.
 </t>
 
 </section>
@@ -145,24 +145,20 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <t>The specification of the &quot;srcport&quot; and &quot;dstport&quot; peer process variables from Section 9.1 (&quot;Peer Process Variables&quot;) of <xref target="RFC5905"/> is updated as follows:
 </t>
 
-<t>
-srcport: UDP port number of the server or reference clock.  This
- becomes the destination port number in packets sent from this
-   association.  When operating in symmetric modes (1 and 2), this field
-   must contain the NTP port number PORT (123) assigned by the IANA.  In
-   other modes, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>.
-</t>
-
-<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it must contain the NTP port number PORT (123) assigned by the IANA.  In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number in packets sent from this association.
+<t>dstport: UDP port number of the client. This becomes the source port number in packets sent from this association. In the symmetric modes (1 and 2), it is ordinarily the NTP port number PORT (123) assigned by the IANA. In the client mode, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/> and the port SHOULD not receive packets from other hosts than the server.
 </t>
 
 <t>
 <list style="hanging">
 <t hangText="NOTES:">
-<vspace blankLines="0" />On most current operating systems (that implement ephemeral port randomization <xref target="RFC6056"/>), an NTP peer may normally rely on the operating system for performing port randomization. For example, NTP implementations employing the Sockets API may achieve port randomization by *not* specifying the local port for the corresponding socket, or bind()ing the local socket to the &quot;special&quot; port 0 (which for the Sockets API has the special meaning of &quot;any port&quot;).
+<vspace blankLines="0" />On most current operating systems (that implement ephemeral port randomization <xref target="RFC6056"/>), an NTP client may normally rely on the operating system for performing port randomization. For example, NTP implementations employing the Sockets API may achieve port randomization by *not* specifying the local port for the corresponding socket, or bind()ing the local socket to the &quot;special&quot; port 0 (which for the Sockets API has the special meaning of &quot;any port&quot;).
+Connecting the socket with connect() will make the port inaccessible by other hosts.
 </t>
 
 <t>A port number might be randomized on a per-association basis, or on a per-request basis. When the port number is randomized on a per-association basis, a random port number is selected when an association is first mobilized, and the selected port remains constant during the life of the association. On the other hand, when the port number is randomized on a per-request basis, each client request will (statistically) employ a different ephemeral port for each request. As noted in <xref target="path-selection"/>, in some scenarios the selected ephemeral port may have an influence on the path employed by the associated packets, and these considerations may affect the decision of whether to randomize the port number on a per-association vs. per-request basis. 
+</t>
+
+<t>If the port is randomized on a per-request basis, it SHOULD stay open for at least 4 seconds if no valid response is received from the server in order to prevent the client from sending an ICMP response when the NTP request or response is delayed in the network.
 </t>
 </list>
 </t>
