@@ -145,14 +145,6 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <t>The specification of the &quot;srcport&quot; and &quot;dstport&quot; peer process variables from Section 9.1 (&quot;Peer Process Variables&quot;) of <xref target="RFC5905"/> is updated as follows:
 </t>
 
-<t>
-srcport: UDP port number of the server or reference clock.  This
- becomes the destination port number in packets sent from this
-   association.  When operating in symmetric modes (1 and 2), this field
-   must contain the NTP port number PORT (123) assigned by the IANA.  In
-   other modes, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>.
-</t>
-
 <t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it must contain the NTP port number PORT (123) assigned by the IANA.  In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number in packets sent from this association.
 </t>
 
