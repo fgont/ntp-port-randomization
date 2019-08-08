@@ -59,6 +59,20 @@ docName="draft-gont-ntp-port-randomization-04">
       </address>
     </author>	
 
+    <author fullname="Miroslav Lichvar" initials="M." surname="Lichvar">
+      <organization>Red Hat</organization>
+      <address>
+        <postal>
+          <street>Purkynova 115</street>
+          <city>Brno</city>
+          <region></region>
+          <code>612 00</code>
+          <country>Czech Republic</country>
+        </postal>
+        <email>mlichvar@redhat.com</email>
+      </address>
+    </author>
+
     <date/>
 
     <area>Internet</area>
@@ -256,9 +270,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <section title="Acknowledgments">
 <t>Watson Ladd raised the problem of DDoS mitigation when the NTP service port is employed as the client port (discussed in <xref target="filtering"/> of this document).</t>
 
-<t>Miroslav Lichvar suggested randomization of the client port on a per-request basis, to intentionally cause each request/response to employ different paths in scenarios where ECMP is employed.</t>
-
-<t>The authors would like to thank (in alphabetical order) Ivan Arce, Todd Glassey, Watson Ladd, Miroslav Lichvar, Aanchal Malhotra, Danny Mayer, Gary E. Miller, Dieter Sibold, Steven Sommars, and Ulrich Windl, for providing valuable comments on earlier versions of this document.</t>
+<t>The authors would like to thank (in alphabetical order) Ivan Arce, Todd Glassey, Watson Ladd, Aanchal Malhotra, Danny Mayer, Gary E. Miller, Dieter Sibold, Steven Sommars, and Ulrich Windl, for providing valuable comments on earlier versions of this document.</t>
 
 
 
