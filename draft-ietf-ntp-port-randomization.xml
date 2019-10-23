@@ -126,7 +126,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 
 <t>As a result of this considerations, BCP 156 <xref target="RFC6056"/> recommends the randomization of transport-protocol ephemeral ports. And as such, this document aims to bring the NTP specification <xref target="RFC5905"/> in line with the aforementioned recommendation.</t>
 
-<t>We note that the use of port randomization is a transport-layer mitigation against off-path/blind attacks, and does not preclude (nor is it precluded by), other possible mitigations for off-path attacks that might be implemented by an application protocol (e.g. <xref target="I-D.ietf-ntp-data-minimization"/>). For instance, some of the aforementioned mitigations may be ineffective against some off-path attacks <xref target="NTP-FRAG"/> or may benefit from the additional entropy provided by port randomization <xref target="NTP-security"/>.
+<t>We note that the use of port randomization is a transport-layer mitigation against off-path/blind attacks, and does not preclude (nor is it precluded by) other possible mitigations for off-path attacks that might be implemented by an application protocol (e.g. <xref target="I-D.ietf-ntp-data-minimization"/>). For instance, some of the aforementioned mitigations may be ineffective against some off-path attacks <xref target="NTP-FRAG"/> or may benefit from the additional entropy provided by port randomization <xref target="NTP-security"/>.
 </t>
 </section>
 
@@ -206,7 +206,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <t hangText="NOTES:">
 <vspace blankLines="0" />When port randomization is employed, the port number must be randomized on a per-association basis. That is, a random port number is selected when an association is first mobilized, and the selected port number is expected to remain constant during the life of an association. 
 </t>
-<t>On most current operating systems (that implement ephemeral port randomization <xref target="RFC6056"/>), an NTP client may normally rely on the operating system for performing port randomization. For example, NTP implementations employing the Sockets API may achieve port randomization by *not* specifying the local port for the corresponding socket, or bind()ing the local socket to the &quot;special&quot; port 0 (which for the Sockets API has the special meaning of &quot;any port&quot;). connect()ing the docket will make the port inaccessible by other systems (that is, only packets from the specified remote socket will be received by the application).
+<t>On most current operating systems (that implement ephemeral port randomization <xref target="RFC6056"/>), an NTP client may normally rely on the operating system for performing port randomization. For example, NTP implementations employing the Sockets API may achieve port randomization by *not* specifying the local port for the corresponding socket, or bind()ing the local socket to the &quot;special&quot; port 0 (which for the Sockets API has the special meaning of &quot;any port&quot;). connect()ing the socket will make the port inaccessible by other systems (that is, only packets from the specified remote socket will be received by the application).
 </t>
 
 </list>
