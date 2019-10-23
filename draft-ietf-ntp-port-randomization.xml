@@ -7,8 +7,8 @@
 <?rfc symrefs="yes" ?>
 <?rfc sortrefs="yes"?>
 
-<rfc updates="rfc5905" category="std" ipr="noDerivativesTrust200902"
-docName="draft-gont-ntp-port-randomization-04">
+<rfc updates="rfc5905" category="std" ipr="trust200902"
+docName="draft-ietf-ntp-port-randomization-00">
   <front>
     <title abbrev="NTP Port Randomization">Port Randomization in the Network Time Protocol Version 4</title>
 
