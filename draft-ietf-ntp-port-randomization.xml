@@ -137,13 +137,11 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <t>A number of intermediate devices implement ECMP routing, selecting the outgoing link based on the result of a hash that typically takes the five-tuple that identifies a traffic "flow" (e.g., TCP connection). <xref target="NTP-CHLNG"/> notes the effect of ECMP on time synchronization. For example, two systems that synchronize their clocks with the same NTP server might end up with a significant offset between their clocks as a result of their NTP requests taking paths with very different characteristics.</t>
 -->
 
-<t>This might mean, for example, that two systems in the same network that synchronize their clocks with the same NTP server might end up with a significant offset between their clocks as a result of their NTP samples taking paths with very different characteristics.</t>
+<t>This might mean, for example, that two clients in the same network synchronized with the same NTP server using a stable source port (selected randomly or not) have a significant offset between their clocks due to their NTP exchanges taking paths with different asymmetry in the network delay.</t>
 
+<t>If the clients changed their source port with each request, packets in different exchanges would take different paths. The measured delay and offset would be less stable, but the offset between the clients' clocks would be smaller. The impact on stability of the clocks would be mitigated by the clock filter algorithm, which prefers samples with shorter delay.</t>
 
-<t>If port randomization is applied for every NTP request, requests/responses would be distributed over the different available paths, including those with the smallest delay. The clock filter algorithm could readily select one of such samples with lowest delays, in the same way that the clock selection and clock cluster algorithms might also end up selecting other time sources with smaller resulting dispersion. On the other hand, if port-randomization is applied on a per-association basis, in scenarios where the aforementioned ECMP algorithm is employed, request/responses to the same association would likely follow the same path, since the IP addresses and transport port numbers employed for an association would not change.
-</t>
-
-<t><xref target="update"/> recommends NTP implementations to randomize the ephemeral port number of non-symmetrical associations on a per-association basis (as opposed to "per-transaction"), since this more conservative approach avoids the possible negative implications of port randomization on time synchronization.</t>
+<t><xref target="update"/> recommends NTP clients to randomize their local port number on a per-exchange basis. It does not prevent the port to be randomized on a per-association basis if stability of the measurements is preferred.</t>
 
 
 
@@ -197,16 +195,16 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 
 <t>
 <list style="hanging">
-<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it must contain the NTP port number PORT (123) assigned by the IANA.  In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number of packets sent from this association.
+<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it must contain the NTP port number PORT (123) assigned by the IANA. In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number of packets sent from this association. The port number SHOULD be selected randomly with each new request.
 </t>
 
 
 <t>
 <list style="hanging">
 <t hangText="NOTES:">
-<vspace blankLines="0" />When port randomization is employed, the port number must be randomized on a per-association basis. That is, a random port number is selected when an association is first mobilized, and the selected port number is expected to remain constant during the life of an association. 
+<vspace blankLines="0" />
 </t>
-<t>On most current operating systems (that implement ephemeral port randomization <xref target="RFC6056"/>), an NTP client may normally rely on the operating system for performing port randomization. For example, NTP implementations employing the Sockets API may achieve port randomization by *not* specifying the local port for the corresponding socket, or bind()ing the local socket to the &quot;special&quot; port 0 (which for the Sockets API has the special meaning of &quot;any port&quot;). connect()ing the socket will make the port inaccessible by other systems (that is, only packets from the specified remote socket will be received by the application).
+<t>On most current operating systems, which implement ephemeral port randomization <xref target="RFC6056"/>, an NTP client may normally rely on the operating system to perform port randomization. For example, NTP implementations using POSIX sockets may achieve port randomization by *not* binding the socket with the bind() function, or binding it to port 0, which has a special meaning of &quot;any port&quot;. Connecting the socket with the connect() function makes the port invisible to other hosts. Opening a new socket for each request implements a per-exchange randomization of the source port.
 </t>
 
 </list>
@@ -214,12 +212,6 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 </list>
 </t>
       </section>
-
-
-<section title="Possible Future Work" anchor="future-work">
-<t>Port numbers could be randomized on a per-association basis, or on a per-request basis. When the port number is randomized on a per-association basis, a random port number is selected when an association is first mobilized, and the selected port remains constant during the life of the association. On the other hand, when the port number is randomized on a per-request basis, each client request will (statistically) employ a different ephemeral port for each request. As discussed in <xref target="considerations"/>, varying the port number across requests may impact the time quality achieved with NTP. As a result, this document recommends the conservative approach of randomizing port numbers on a per-association basis (as opposed to a "per-transaction" basis). The possibility of randomizing port numbers on a per-transaction may be subject of future work, and is not recommended by this document.
-</t>
-</section>
 
 
       <section title="Implementation Status" anchor="implementation">
