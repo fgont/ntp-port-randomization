@@ -246,7 +246,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <vspace blankLines="0" /><xref target="OpenNTPD"/> has never explicitly set the local port of NTP clients, and thus employs the ephemeral port selection algorithm implemented by the operating system. Thus, on all operating systems that implement port randomization (such as current versions of OpenBSD, Linux, and FreeBSD), OpenNTPD will employ port randomization for client ports.
 </t>
 <t hangText="chrony:">
-<vspace blankLines="0" /><xref target="chrony"/> has never explicitly set the local port of NTP clients, and thus employs the ephemeral port selection algorithm implemented by the operating system. Thus, on all operating systems that implement port randomization (such as current versions of OpenBSD, Linux, and FreeBSD), chrony will employ port randomization for client ports.
+<vspace blankLines="0" /><xref target="chrony"/> by default does not set the local client port, and thus employs the ephemeral port selection algorithm implemented by the operating system. Thus, on all operating systems that implement port randomization (such as current versions of OpenBSD, Linux, and FreeBSD), chrony will employ port randomization for client ports.
 </t>
 <t hangText="nwtime.org's sntp client:">
 <vspace blankLines="0" />sntp does not explicitly set the local port, and thus employs the ephemeral port selection algorithm implemented by the operating system. Thus, on all operating systems that implement port randomization (such as current versions of OpenBSD, Linux, and FreeBSD), it will employ port randomization for client ports.
