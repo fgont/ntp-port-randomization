@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
+<?rfc subcompact="no" ?>
+<?rfc toc="yes" ?>
+<?rfc symrefs="yes" ?>
+<?rfc sortrefs="yes"?>
+
+<rfc updates="rfc5905" category="std" ipr="trust200902"
+docName="draft-ietf-ntp-port-randomization-01">
+  <front>
+    <title abbrev="NTP Port Randomization">Port Randomization in the Network Time Protocol Version 4</title>
+
+
+    <author fullname="Fernando Gont" initials="F." surname="Gont">
+
+      <organization abbrev="SI6 Networks">SI6 Networks</organization>
+      <address>
+        <postal>
+          <street>Evaristo Carriego 2644</street>
+          <code>1706</code>
+          <city>Haedo</city>
+          <region>Provincia de Buenos Aires</region>
+          <country>Argentina</country>
+        </postal>
+        <phone>+54 11 4650 8472</phone>
+        <email>fgont@si6networks.com</email>
+        <uri>https://www.si6networks.com</uri>
+       </address>
+    </author>
+
+    <author fullname="Guillermo Gont" initials="G.D." surname="Gont">
+      <!-- abbrev not needed but can be used for the header
+         if the full organization name is too long -->
+
+      <organization abbrev="SI6 Networks">SI6 Networks</organization>
+
+      <address>
+        <postal>
+          <!-- I've omitted my street address here -->
+
+          <street>Evaristo Carriego 2644</street>
+
+          <code>1706</code>
+
+          <city>Haedo</city>
+
+          <region>Provincia de Buenos Aires</region>
+
+          <country>Argentina</country>
+        </postal>
+
+        <phone>+54 11 4650 8472</phone>
+
+        <email>ggont@si6networks.com</email>
+
+        <uri>https://www.si6networks.com</uri>
+      </address>
+    </author>	
+
+    <author fullname="Miroslav Lichvar" initials="M." surname="Lichvar">
+      <organization>Red Hat</organization>
+      <address>
+        <postal>
+          <street>Purkynova 115</street>
+          <city>Brno</city>
+          <region></region>
+          <code>612 00</code>
+          <country>Czech Republic</country>
+        </postal>
+        <email>mlichvar@redhat.com</email>
+      </address>
+    </author>
+
+    <date/>
+
+    <area>Internet</area>
+    <workgroup>Network Time Protocol (ntp) Working Group</workgroup>
+
+<!-- [rfced] Please insert any keywords (beyond those that appear in
+the title) for use on http://www.rfc-editor.org/search.html. -->
+
+<keyword>privacy</keyword>
+<keyword>anonymity</keyword> 
+<keyword>unlinkability</keyword>
+
+
+
+    <abstract>
+      <t>The Network Time Protocol can operate in several modes. Some of these modes are based on the receipt of unsolicited packets, and therefore require the use of a service/well-known port as the local port number. However, in the case of NTP modes where the use of a service/well-known port is not required, employing such well-known/service port unnecessarily increases the ability of attackers to perform blind/off-path attacks. This document formally updates RFC5905, recommending the use of port randomization for those modes where use of the NTP service port is not required.</t>
+    </abstract>
+  </front>
+  <middle>
+    <section anchor="intro" title="Introduction">
+<t>The Network Time Protocol (NTP) is one of the oldest Internet protocols, and currently specified in <xref target="RFC5905"/>. Since its original implementation, standardization, and deployment, a number of vulnerabilities have been found both in the NTP specification and in some of its implementations <xref target="NTP-VULN"/>. Some of these vulnerabilities allow for off-path/blind attacks, where an attacker can send forged packets to one or both NTP peers for achieving Denial of Service (DoS), time-shifts, and other undesirable outcomes. Many of these attacks require the attacker to guess or know at least a target NTP association, typically identified by the tuple {srcaddr, srcport, dstaddr, dstport, keyid}. Some of these parameters may be easily known or guessed.</t>
+
+      <t>NTP can operate in several modes. Some of these modes rely on the ability of nodes to receive unsolicited packets, and therefore require the use of a service/well-known port number. However, for modes where the use of a service/well-known port is not required, employing such well-known/service port improves the ability of an attacker to perform blind/off-path attacks (since knowledge of such port number is typically required for such attacks). A recent study <xref target="NIST-NTP"/> that analyzes the port numbers employed by NTP clients suggests that a considerable number of NTP clients employ the NTP service/well-known port as their local port, or select predictable ephemeral port numbers, thus improving the ability of attackers to perform blind/off-path attacks against NTP.</t>
+
+<!--
+<t>BCP 156 <xref target="RFC6056"/> already recommends the randomization of transport-protocol ephemeral ports, and thus this document formally updates <xref target="RFC5905"/> such that port randomization is employed for those NTP modes for which the use of the NTP service port is not required. This document aligns NTP with the current advice on ephemeral port selection (port randomization).</t> 
+-->
+
+<t>BCP 156 <xref target="RFC6056"/> already recommends the randomization of transport-protocol ephemeral ports. This document aligns NTP with the recommendation in BCP 156 <xref target="RFC6056"/>, by formally updating <xref target="RFC5905"/> such that port randomization is employed for those NTP modes for which the use of the NTP service port is not required.</t>
+
+
+</section>
+
+
+
+	<section title="Terminology" anchor="term">
+
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+        "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
+        and "OPTIONAL" in this document are to be interpreted as
+        described in 
+        <xref target='RFC2119' />.</t>
+
+</section>
+
+<section title="Considerations About Port Randomization in NTP" anchor="considerations">
+<t>The following subsections analyze a number of considerations about transport-protocol port randomization when applied to NTP.</t>
+
+<section title="Mitigation Against Off-path Attacks" anchor="attack-mitigation">
+<t>There has been a fair share of work in the area of off-path/blind attacks against transport protocols and upper-layer protocols, such as <xref target="RFC5927"/> and <xref target="RFC4953"/>. Whether the target of the attack is a transport protocol instance (e.g., TCP connection) or an upper-layer protocol instance (e.g., an application protocol instance), the attacker is required to know or guess the five-tuple {Protocol, IP Source Address, IP Destination Address, Source Port, Destination Port} that identifies the target transport protocol instance or the transport protocol instance employed by the target upper-layer protocol instance. Therefore, increasing the difficulty of guessing this five-tuple helps mitigate blind/off-path attacks.</t>
+
+<t>As a result of this considerations, BCP 156 <xref target="RFC6056"/> recommends the randomization of transport-protocol ephemeral ports. And as such, this document aims to bring the NTP specification <xref target="RFC5905"/> in line with the aforementioned recommendation.</t>
+
+<t>We note that the use of port randomization is a transport-layer mitigation against off-path/blind attacks, and does not preclude (nor is it precluded by) other possible mitigations for off-path attacks that might be implemented by an application protocol (e.g. <xref target="I-D.ietf-ntp-data-minimization"/>). For instance, some of the aforementioned mitigations may be ineffective against some off-path attacks <xref target="NTP-FRAG"/> or may benefit from the additional entropy provided by port randomization <xref target="NTP-security"/>.
+</t>
+</section>
+
+<section title="Effects on Path Selection" anchor="path-selection">
+
+<t>Intermediate systems implementing the Equal-Cost Multi-Path (ECMP) algorithm may select the outgoing link by computing a hash over a number of values, that include the transport-protocol source port. Thus, as discussed in <xref target="NTP-CHLNG"/>, the selected client port may have an influence on the measured delay and jitter values. <!-- XXX expand the discussion --> </t>
+<!--
+<t>A number of intermediate devices implement ECMP routing, selecting the outgoing link based on the result of a hash that typically takes the five-tuple that identifies a traffic "flow" (e.g., TCP connection). <xref target="NTP-CHLNG"/> notes the effect of ECMP on time synchronization. For example, two systems that synchronize their clocks with the same NTP server might end up with a significant offset between their clocks as a result of their NTP requests taking paths with very different characteristics.</t>
+-->
+
+<t>This might mean, for example, that two clients in the same network synchronized with the same NTP server using a stable source port (selected randomly or not) have a significant offset between their clocks due to their NTP exchanges taking paths with different asymmetry in the network delay.</t>
+
+<t>If the clients changed their source port with each request, packets in different exchanges would take different paths. The measured delay and offset would be less stable, but the offset between the clients' clocks would be smaller. The impact on stability of the clocks would be mitigated by the clock filter algorithm, which prefers samples with shorter delay.</t>
+
+<t>On the other hand, if port-randomization is applied on a per-association basis, request/responses to the same association would likely follow the same path, since the IP addresses and transport port numbers employed for an association would not change. This would thus result in more stability of the measurements.
+</t>
+
+<t><xref target="update"/> recommends NTP implementations to randomize the ephemeral port number of non-symmetrical associations on a per-association basis (as opposed to "per-request"), since this is believed to be the more conservative approach. However, implementations may override this setting and perform port-randomization on a per-request basis.</t>
+
+
+</section>
+
+<section title="Filtering of NTP traffic" anchor="filtering">
+<t>In a number of scenarios (such as when mitigating DDoS attacks), a network operator may want to differentiate between NTP requests sent by clients, and NTP responses sent by NTP servers. If an implementation employs the NTP service port for the client port number, requests/responses cannot be readily differentiated by inspecting the source and destination port numbers. Implementation of port randomization for non-symmetrical modes allows for simple differentiation of NTP requests and responses, and for the enforcement of security policies that may be valuable for the mitigation of DDoS attacks.
+</t>
+</section>
+
+
+<section title="Effect on NAT devices" anchor="nats">
+<t>Some NAT devices will not translate the source port of a packet when a privileged port number is employed. In networks where such NAT devices are employed, use of the NTP service port for the client port will essentially limit the number of hosts that may successfully employ NTP client implementations.
+</t>
+
+<t>In the case of NAT devices that will translate the source port even when a privileged port is employed, packets reaching the external realm of the NAT will not employ the NTP service port as the local port, since the local port will normally be translated by the NAT device possibly, but not necessarily, with a random port.</t>
+</section>
+
+<section title="Relation to Other Mitigations for Off-Path Attacks" anchor="other-mitigations">
+<t>Ephemeral Port Randomization is a best current practice (BCP 156) that helps mitigate off-path attacks at the transport-layer. It is orthogonal to other possible mitigations for off-path attacks that may be implemented at other layers (such as the use of timestamps in NTP) which may or may not be effective against some off-path attacks (see e.g. <xref target="NTP-FRAG"/>. This document aligns NTP with the existing best current practice on ephemeral port selection, irrespective of other techniques that may (and should) be implemented for mitigating off-path attacks.
+</t>
+</section>
+
+</section>
+
+
+
+
+      <section title="Update to RFC5905" anchor="update">
+
+<!--
+<t>The specification of the &quot;dstport&quot; peer process variable from Section 9.1 (&quot;Peer Process Variables&quot;) of <xref target="RFC5905"/> is updated as follows:
+</t>
+-->
+
+<t>The following text from Section 9.1 (&quot;Peer Process Variables&quot;) of <xref target="RFC5905"/>:
+</t>
+
+<t>
+<list style="hanging">
+<t>
+   dstport: UDP port number of the client, ordinarily the NTP port
+   number PORT (123) assigned by the IANA.  This becomes the source port
+   number in packets sent from this association.
+</t>
+</list>
+</t>
+
+
+<t>is replaced with:</t>
+
+<t>
+<list style="hanging">
+<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it SHOULD contain the NTP port number PORT (123) assigned by the IANA. In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number of packets sent from this association.<!-- The port number SHOULD be selected randomly with each new request.-->
+</t>
+
+
+<t>
+<list style="hanging">
+<t hangText="NOTES:">
+<vspace blankLines="0" />
+When port randomization is employed, the port number SHOULD be randomized on a per-association basis. That is, a random port number SHOULD selected when an association is first mobilized, and the selected port number is expected to remain constant during the life of an association. An implementation MAY, however, override this setting and employ port randomization on a per-request basis.
+</t>
+<t>On most current operating systems, which implement ephemeral port randomization <xref target="RFC6056"/>, an NTP client may normally rely on the operating system to perform port randomization. For example, NTP implementations using POSIX sockets may achieve port randomization by *not* binding the socket with the bind() function, or binding it to port 0, which has a special meaning of &quot;any port&quot;. connect()ing the docket will make the port inaccessible by other systems (that is, only packets from the specified remote socket will be received by the application).
+</t>
+
+</list>
+</t>
+</list>
+</t>
+      </section>
+
+
+      <section title="Implementation Status" anchor="implementation">
+<t>[RFC Editor: Please remove this section before publication of this document as an RFC.]</t>
+<t>
+
+   This section records the status of known implementations of the
+   protocol defined by this specification at the time of posting of this
+   Internet-Draft, and is based on a proposal described in <xref target="RFC7942"/>.  The
+   description of implementations in this section is intended to assist
+   the IETF in its decision processes in progressing drafts to RFCs.
+   Please note that the listing of any individual implementation here
+   does not imply endorsement by the IETF.  Furthermore, no effort has
+   been spent to verify the information presented here that was supplied
+   by IETF contributors.  This is not intended as, and must not be
+   construed to be, a catalog of available implementations or their
+   features.  Readers are advised to note that other implementations may
+   exist.
+</t>
+
+<t>
+<list style="hanging">
+<t hangText="OpenNTPD:">
+<vspace blankLines="0" /><xref target="OpenNTPD"/> has never explicitly set the local port of NTP clients, and thus employs the ephemeral port selection algorithm implemented by the operating system. Thus, on all operating systems that implement port randomization (such as current versions of OpenBSD, Linux, and FreeBSD), OpenNTPD will employ port randomization for client ports.
+</t>
+<t hangText="chrony:">
+<vspace blankLines="0" /><xref target="chrony"/> by default does not set the local client port, and thus employs the ephemeral port selection algorithm implemented by the operating system. Thus, on all operating systems that implement port randomization (such as current versions of OpenBSD, Linux, and FreeBSD), chrony will employ port randomization for client ports.
+</t>
+<t hangText="nwtime.org's sntp client:">
+<vspace blankLines="0" />sntp does not explicitly set the local port, and thus employs the ephemeral port selection algorithm implemented by the operating system. Thus, on all operating systems that implement port randomization (such as current versions of OpenBSD, Linux, and FreeBSD), it will employ port randomization for client ports.
+</t>
+</list>
+</t>
+</section>
+
+
+<section title="IANA Considerations">
+<t>There are no IANA registries within this document. The RFC-Editor can remove this section before publication of this document as an RFC.</t>
+</section>
+
+<section title="Security Considerations">
+<t>The security implications of predictable numeric identifiers <xref target="I-D.gont-predictable-numeric-ids"/> (and of predictable transport-protocol port numbers <xref target="RFC6056"/> in particular) have been known for a long time now. However, the NTP specification has traditionally followed a pattern of employing common settings and code even when not strictly necessary, which at times has resulted in negative security and privacy implications (see e.g. <xref target="I-D.ietf-ntp-data-minimization"/>). The use of the NTP service port (123) for the srcport and dstport variables is not required for all operating modes, and such unnecessary usage comes at the expense of reducing the amount of work required for an attacker to successfully perform off-path/blind attacks against NTP. Therefore, this document formally updates <xref target="RFC5905"/>, recommending the use of transport-protocol port randomization when use of the NTP service port is not required.</t>
+
+<t>This issue has been tracked by US-CERT with VU#597821, and has been assigned CVE-2019-11331.</t>
+</section>
+
+
+<section title="Acknowledgments">
+<t>Watson Ladd raised the problem of DDoS mitigation when the NTP service port is employed as the client port (discussed in <xref target="filtering"/> of this document).</t>
+
+<t>The authors would like to thank (in alphabetical order) Ivan Arce, Todd Glassey, Watson Ladd, Aanchal Malhotra, Danny Mayer, Gary E. Miller, Dieter Sibold, Steven Sommars, and Ulrich Windl, for providing valuable comments on earlier versions of this document.</t>
+
+
+
+<t>The authors would like to thank Harlan Stenn for answering questions about nwtime.org's NTP implementation. </t>
+
+<t>Fernando would like to thank Nelida Garcia and Jorge Oscar Gont, for their love and support.</t>
+    </section>
+
+  </middle>
+  <back>
+
+    <references title="Normative References">
+
+
+	<?rfc include="reference.RFC.2119" ?>
+	<?rfc include="reference.RFC.5905" ?>
+	<?rfc include="reference.RFC.6056" ?>
+	</references>
+
+
+
+
+
+    <references title="Informative References">
+
+	<?rfc include="reference.RFC.5927" ?>
+	<?rfc include="reference.RFC.4953" ?>
+	<?rfc include="reference.RFC.7942" ?>
+	<?rfc include="reference.I-D.ietf-ntp-data-minimization" ?>
+	<?rfc include="reference.I-D.gont-predictable-numeric-ids" ?>
+
+
+
+	<reference anchor="NTP-CHLNG" target="http://leapsecond.com/ntp/NTP_Paper_Sommars_PTTI2017.pdf">
+		<front>
+			<title>Challenges in Time Transfer Using the Network Time Protocol (NTP)</title>
+
+
+			<author initials="S. E." surname="Sommars" fullname="Steven E. Sommars">
+				<organization>Nokia</organization>
+			</author>
+
+			<date year="2017" month="January"/>
+		</front>
+		<seriesInfo name="Proceedings of the 48th Annual Precise Time and Time Interval Systems and Applications Meeting, Monterey, California" value=" pp. 271-290" />
+	</reference>
+
+
+	<reference anchor="NTP-FRAG" target="http://www.cs.bu.edu/~goldbe/papers/NTPattack.pdf">
+		<front>
+			<title>Attacking the Network Time Protocol</title>
+
+
+			<author initials="A." surname="Malhotra" fullname="Aanchal Malhotra">
+				<organization></organization>
+			</author>
+
+			<author initials="I. E." surname="Cohen" fullname="Isaac E. Cohen">
+				<organization></organization>
+			</author>
+
+			<author initials="E." surname="Brakke" fullname="Erik Brakke">
+				<organization></organization>
+			</author>
+
+
+			<author initials="S." surname="Goldberg" fullname="Sharon Goldberg">
+				<organization></organization>
+			</author>
+
+			<date year="2017"/>
+		</front>
+		<seriesInfo name="NDSS'17, San Diego, CA." value=" Feb 2017" />
+	</reference>
+
+	<reference anchor="NTP-security" target="https://eprint.iacr.org/2016/1006">
+		<front>
+			<title>The Security of NTP's Datagram Protocol</title>
+
+
+			<author initials="A." surname="Malhotra" fullname="Aanchal Malhotra">
+				<organization></organization>
+			</author>
+
+			<author initials="M." surname="Van Gundy" fullname="Matthew Van Gundy">
+				<organization></organization>
+			</author>
+
+			<author initials="V." surname="Varia" fullname="Mayank Varia">
+				<organization></organization>
+			</author>
+
+			<author initials="H." surname="Kennedy" fullname="Haydn Kennedy">
+				<organization></organization>
+			</author>
+
+			<author initials="J." surname="Gardner" fullname="Jonathan Gardner">
+				<organization></organization>
+			</author>
+
+			<author initials="S." surname="Goldberg" fullname="Sharon Goldberg">
+				<organization></organization>
+			</author>
+			<date year="2016"/>
+		</front>
+		<seriesInfo name="Cryptology ePrint Archive" value="Report 2016/1006" />
+	</reference>
+
+	<reference anchor="NIST-NTP" target="https://tf.nist.gov/general/pdf/2818.pdf">
+		<front>
+			<title>Usage Analysis of the NIST Internet Time Service</title>
+
+
+			<author initials="J.A." surname="Sherman" fullname="Jeff A. Sherman">
+				<organization></organization>
+			</author>
+
+			<author initials="J." surname="Levine" fullname="Judah Levine">
+				<organization></organization>
+			</author>
+			<date year="2016" month="March" day="8"/>
+		</front>
+		<seriesInfo name="Journal of Research of the National Institute of Standards and Technology" value="Volume 121" />
+	</reference>
+
+
+
+
+	<reference anchor="NTP-VULN" target="https://support.ntp.org/bin/view/Main/SecurityNotice">
+		<front>
+			<title>Security Notice</title>
+			<author initials="" surname="Network Time Foundation" fullname="Network Time Foundation">
+				<organization></organization>
+			</author>
+			<date/>
+		</front>
+		<seriesInfo name="Network Time Foundation's NTP Support Wiki" value="" />
+	</reference>
+
+
+
+	<reference anchor="OpenNTPD" target="https://www.openntpd.org">
+		<front>
+			<title>OpenNTPD Project</title>
+			<author>
+				<organization></organization>
+			</author>
+			<date year=""/>
+		</front>
+	</reference>
+
+	<reference anchor="chrony" target="https://chrony.tuxfamily.org/">
+		<front>
+			<title>chrony</title>
+			<author>
+				<organization></organization>
+			</author>
+			<date year=""/>
+		</front>
+	</reference>
+
+
+
+
+    </references>
+
+  </back>
+</rfc>
+<!--
+Local Variables:
+mode:xml
+End:
+=-->
