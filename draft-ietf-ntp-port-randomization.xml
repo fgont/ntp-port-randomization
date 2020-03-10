@@ -8,7 +8,7 @@
 <?rfc sortrefs="yes"?>
 
 <rfc updates="rfc5905" category="std" ipr="trust200902"
-docName="draft-ietf-ntp-port-randomization-00">
+docName="draft-ietf-ntp-port-randomization">
   <front>
     <title abbrev="NTP Port Randomization">Port Randomization in the Network Time Protocol Version 4</title>
 
@@ -141,8 +141,10 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 
 <t>If the clients changed their source port with each request, packets in different exchanges would take different paths. The measured delay and offset would be less stable, but the offset between the clients' clocks would be smaller. The impact on stability of the clocks would be mitigated by the clock filter algorithm, which prefers samples with shorter delay.</t>
 
-<t><xref target="update"/> recommends NTP clients to randomize their local port number on a per-exchange basis. It does not prevent the port to be randomized on a per-association basis if stability of the measurements is preferred.</t>
+<t>On the other hand, if port-randomization is applied on a per-association basis, request/responses to the same association would likely follow the same path, since the IP addresses and transport port numbers employed for an association would not change. This would thus result in more stability of the measurements.
+</t>
 
+<t><xref target="update"/> recommends NTP implementations to randomize the ephemeral port number of non-symmetrical associations on a per-association basis (as opposed to "per-request"), since this is believed to be the more conservative approach. However, implementations may override this setting and perform port-randomization on a per-request basis.</t>
 
 
 </section>
@@ -195,7 +197,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 
 <t>
 <list style="hanging">
-<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it SHOULD be the NTP port number PORT (123) assigned by the IANA. In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number of packets sent from this association. The port number SHOULD be selected randomly with each new request.
+<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it SHOULD contain the NTP port number PORT (123) assigned by the IANA. In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number of packets sent from this association.<!-- The port number SHOULD be selected randomly with each new request.-->
 </t>
 
 
@@ -203,8 +205,9 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <list style="hanging">
 <t hangText="NOTES:">
 <vspace blankLines="0" />
+When port randomization is employed, the port number SHOULD be randomized on a per-association basis. That is, a random port number SHOULD selected when an association is first mobilized, and the selected port number is expected to remain constant during the life of an association. An implementation MAY, however, override this setting and employ port randomization on a per-request basis.
 </t>
-<t>On most current operating systems, which implement ephemeral port randomization <xref target="RFC6056"/>, an NTP client may normally rely on the operating system to perform port randomization. For example, NTP implementations using POSIX sockets may achieve port randomization by *not* binding the socket with the bind() function, or binding it to port 0, which has a special meaning of &quot;any port&quot;. Connecting the socket with the connect() function makes the port invisible to other hosts. Opening a new socket for each request implements a per-exchange randomization of the source port.
+<t>On most current operating systems, which implement ephemeral port randomization <xref target="RFC6056"/>, an NTP client may normally rely on the operating system to perform port randomization. For example, NTP implementations using POSIX sockets may achieve port randomization by *not* binding the socket with the bind() function, or binding it to port 0, which has a special meaning of &quot;any port&quot;. connect()ing the docket will make the port inaccessible by other systems (that is, only packets from the specified remote socket will be received by the application).
 </t>
 
 </list>
