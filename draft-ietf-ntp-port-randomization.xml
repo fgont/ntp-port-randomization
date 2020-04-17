@@ -8,7 +8,7 @@
 <?rfc sortrefs="yes"?>
 
 <rfc updates="rfc5905" category="std" ipr="trust200902"
-docName="draft-ietf-ntp-port-randomization">
+docName="draft-ietf-ntp-port-randomization-03">
   <front>
     <title abbrev="NTP Port Randomization">Port Randomization in the Network Time Protocol Version 4</title>
 
@@ -93,15 +93,15 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
   </front>
   <middle>
     <section anchor="intro" title="Introduction">
-<t>The Network Time Protocol (NTP) is one of the oldest Internet protocols, and currently specified in <xref target="RFC5905"/>. Since its original implementation, standardization, and deployment, a number of vulnerabilities have been found both in the NTP specification and in some of its implementations <xref target="NTP-VULN"/>. Some of these vulnerabilities allow for off-path/blind attacks, where an attacker can send forged packets to one or both NTP peers for achieving Denial of Service (DoS), time-shifts, and other undesirable outcomes. Many of these attacks require the attacker to guess or know at least a target NTP association, typically identified by the tuple {srcaddr, srcport, dstaddr, dstport, keyid}. Some of these parameters may be easily known or guessed.</t>
+<t>The Network Time Protocol (NTP) is one of the oldest Internet protocols, and currently specified in <xref target="RFC5905"/>. Since its original implementation, standardization, and deployment, a number of vulnerabilities have been found both in the NTP specification and in some of its implementations <xref target="NTP-VULN"/>. Some of these vulnerabilities allow for off-path/blind attacks, where an attacker can send forged packets to one or both NTP peers for achieving Denial of Service (DoS), time-shifts, or other undesirable outcomes. Many of these attacks require the attacker to guess or know at least a target NTP association, typically identified by the tuple {srcaddr, srcport, dstaddr, dstport, keyid}. Some of these parameters may be easily known or guessed.</t>
 
-      <t>NTP can operate in several modes. Some of these modes rely on the ability of nodes to receive unsolicited packets, and therefore require the use of a service/well-known port number. However, for modes where the use of a service/well-known port is not required, employing such well-known/service port improves the ability of an attacker to perform blind/off-path attacks (since knowledge of such port number is typically required for such attacks). A recent study <xref target="NIST-NTP"/> that analyzes the port numbers employed by NTP clients suggests that a considerable number of NTP clients employ the NTP service/well-known port as their local port, or select predictable ephemeral port numbers, thus improving the ability of attackers to perform blind/off-path attacks against NTP.</t>
+      <t>NTP can operate in several modes. Some of these modes rely on the ability of nodes to receive unsolicited packets, and therefore require the use of a service/well-known port number (123). However, for modes where the use of a service/well-known port is not required, employing the well-known/service port improves the ability of an attacker to perform blind/off-path attacks (since knowledge of the port numbers is typically required for such attacks). A recent study <xref target="NIST-NTP"/> that analyzes the port numbers employed by NTP clients suggests that a considerable number of NTP clients employ the NTP service/well-known port as their local port, or select predictable ephemeral port numbers, thus improving the ability of attackers to perform blind/off-path attacks against NTP.</t>
 
 <!--
 <t>BCP 156 <xref target="RFC6056"/> already recommends the randomization of transport-protocol ephemeral ports, and thus this document formally updates <xref target="RFC5905"/> such that port randomization is employed for those NTP modes for which the use of the NTP service port is not required. This document aligns NTP with the current advice on ephemeral port selection (port randomization).</t> 
 -->
 
-<t>BCP 156 <xref target="RFC6056"/> already recommends the randomization of transport-protocol ephemeral ports. This document aligns NTP with the recommendation in BCP 156 <xref target="RFC6056"/>, by formally updating <xref target="RFC5905"/> such that port randomization is employed for those NTP modes for which the use of the NTP service port is not required.</t>
+<t>BCP 156 <xref target="RFC6056"/> already recommends the randomization of transport-protocol ephemeral ports. This document aligns NTP with the recommendation in BCP 156 <xref target="RFC6056"/>, by formally updating <xref target="RFC5905"/> such that port randomization is employed for those NTP modes for which the use of the NTP service port is not needed.</t>
 
 
 </section>
@@ -124,7 +124,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <section title="Mitigation Against Off-path Attacks" anchor="attack-mitigation">
 <t>There has been a fair share of work in the area of off-path/blind attacks against transport protocols and upper-layer protocols, such as <xref target="RFC5927"/> and <xref target="RFC4953"/>. Whether the target of the attack is a transport protocol instance (e.g., TCP connection) or an upper-layer protocol instance (e.g., an application protocol instance), the attacker is required to know or guess the five-tuple {Protocol, IP Source Address, IP Destination Address, Source Port, Destination Port} that identifies the target transport protocol instance or the transport protocol instance employed by the target upper-layer protocol instance. Therefore, increasing the difficulty of guessing this five-tuple helps mitigate blind/off-path attacks.</t>
 
-<t>As a result of this considerations, BCP 156 <xref target="RFC6056"/> recommends the randomization of transport-protocol ephemeral ports. And as such, this document aims to bring the NTP specification <xref target="RFC5905"/> in line with the aforementioned recommendation.</t>
+<t>As a result of this considerations, BCP 156 <xref target="RFC6056"/> recommends the randomization of transport-protocol ephemeral ports. Thus, this document aims to bring the NTP specification <xref target="RFC5905"/> in line with the aforementioned recommendation.</t>
 
 <t>We note that the use of port randomization is a transport-layer mitigation against off-path/blind attacks, and does not preclude (nor is it precluded by) other possible mitigations for off-path attacks that might be implemented by an application protocol (e.g. <xref target="I-D.ietf-ntp-data-minimization"/>). For instance, some of the aforementioned mitigations may be ineffective against some off-path attacks <xref target="NTP-FRAG"/> or may benefit from the additional entropy provided by port randomization <xref target="NTP-security"/>.
 </t>
@@ -139,18 +139,18 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 
 <t>This might mean, for example, that two clients in the same network synchronized with the same NTP server using a stable source port (selected randomly or not) have a significant offset between their clocks due to their NTP exchanges taking paths with different asymmetry in the network delay.</t>
 
-<t>If the clients changed their source port with each request, packets in different exchanges would take different paths. The measured delay and offset would be less stable, but the offset between the clients' clocks would be smaller. The impact on stability of the clocks would be mitigated by the clock filter algorithm, which prefers samples with shorter delay.</t>
+<t>If the clients changed their source port with each request, packets in different exchanges would take different paths. When clients change their source ports with each request, the RTT may be more variable.  Whether this improves or worsens time and frequency transfer is unpredictable. The impact on stability of the clocks would be mitigated by the clock filter algorithm, which prefers samples with shorter delay.</t>
 
 <t>On the other hand, if port-randomization is applied on a per-association basis, request/responses to the same association would likely follow the same path, since the IP addresses and transport port numbers employed for an association would not change. This would thus result in more stability of the measurements.
 </t>
 
-<t><xref target="update"/> recommends NTP implementations to randomize the ephemeral port number of non-symmetrical associations on a per-association basis (as opposed to "per-request"), since this is believed to be the more conservative approach. However, implementations may override this setting and perform port-randomization on a per-request basis.</t>
+<t><xref target="update"/> recommends NTP implementations to randomize the ephemeral port number of non-symmetrical associations. The choice of whether to randomize the port number on a per-association or a per-request basis is left to the implementation.</t>
 
 
 </section>
 
 <section title="Filtering of NTP traffic" anchor="filtering">
-<t>In a number of scenarios (such as when mitigating DDoS attacks), a network operator may want to differentiate between NTP requests sent by clients, and NTP responses sent by NTP servers. If an implementation employs the NTP service port for the client port number, requests/responses cannot be readily differentiated by inspecting the source and destination port numbers. Implementation of port randomization for non-symmetrical modes allows for simple differentiation of NTP requests and responses, and for the enforcement of security policies that may be valuable for the mitigation of DDoS attacks.
+<t>In a number of scenarios (such as when mitigating DDoS attacks), a network operator may want to differentiate between NTP requests sent by clients, and NTP responses sent by NTP servers. If an implementation employs the NTP service port for the client port number, requests/responses cannot be readily differentiated by inspecting the source and destination port numbers. Implementation of port randomization for non-symmetrical modes allows for simple differentiation of NTP requests and responses, and for the enforcement of security policies that may be valuable for the mitigation of DDoS attacks, when all NTP clients in a given network employ port randomization.
 </t>
 </section>
 
@@ -197,7 +197,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 
 <t>
 <list style="hanging">
-<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it SHOULD contain the NTP port number PORT (123) assigned by the IANA. In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number of packets sent from this association.<!-- The port number SHOULD be selected randomly with each new request.-->
+<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it SHOULD contain the NTP port number PORT (123) assigned by the IANA. In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number of packets sent from this association. The randomized port number SHOULD NOT be shared with other associations.<!-- The port number SHOULD be selected randomly with each new request.-->
 </t>
 
 
@@ -205,9 +205,12 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 <list style="hanging">
 <t hangText="NOTES:">
 <vspace blankLines="0" />
-When port randomization is employed, the port number SHOULD be randomized on a per-association basis. That is, a random port number SHOULD selected when an association is first mobilized, and the selected port number is expected to remain constant during the life of an association. An implementation MAY, however, override this setting and employ port randomization on a per-request basis.
+The choice of whether to randomize the port number on a per-request or a per-association basis is left to the implementation, and should consider, among others, the considerations discussed in <xref target="path-selection"/>.
+
+<!--
+When port randomization is employed, the port number SHOULD be randomized on a per-association basis. That is, a random port number SHOULD selected when an association is first mobilized, and the selected port number is expected to remain constant during the life of an association. An implementation MAY, however, override this setting and employ port randomization on a per-request basis. -->
 </t>
-<t>On most current operating systems, which implement ephemeral port randomization <xref target="RFC6056"/>, an NTP client may normally rely on the operating system to perform port randomization. For example, NTP implementations using POSIX sockets may achieve port randomization by *not* binding the socket with the bind() function, or binding it to port 0, which has a special meaning of &quot;any port&quot;. connect()ing the docket will make the port inaccessible by other systems (that is, only packets from the specified remote socket will be received by the application).
+<t>On most current operating systems, which implement ephemeral port randomization <xref target="RFC6056"/>, an NTP client may normally rely on the operating system to perform port randomization. For example, NTP implementations using POSIX sockets may achieve port randomization by *not* binding the socket with the bind() function, or binding it to port 0, which has a special meaning of &quot;any port&quot;. connect()ing the socket will make the port inaccessible by other systems (that is, only packets from the specified remote socket will be received by the application).
 </t>
 
 </list>
@@ -256,18 +259,17 @@ When port randomization is employed, the port number SHOULD be randomized on a p
 </section>
 
 <section title="Security Considerations">
-<t>The security implications of predictable numeric identifiers <xref target="I-D.gont-predictable-numeric-ids"/> (and of predictable transport-protocol port numbers <xref target="RFC6056"/> in particular) have been known for a long time now. However, the NTP specification has traditionally followed a pattern of employing common settings and code even when not strictly necessary, which at times has resulted in negative security and privacy implications (see e.g. <xref target="I-D.ietf-ntp-data-minimization"/>). The use of the NTP service port (123) for the srcport and dstport variables is not required for all operating modes, and such unnecessary usage comes at the expense of reducing the amount of work required for an attacker to successfully perform off-path/blind attacks against NTP. Therefore, this document formally updates <xref target="RFC5905"/>, recommending the use of transport-protocol port randomization when use of the NTP service port is not required.</t>
+<t>The security implications of predictable numeric identifiers <xref target="I-D.irtf-pearg-numeric-ids-generation"/> (and of predictable transport-protocol port numbers <xref target="RFC6056"/> in particular) have been known for a long time now. However, the NTP specification has traditionally followed a pattern of employing common settings and code even when not strictly necessary, which at times has resulted in negative security and privacy implications (see e.g. <xref target="I-D.ietf-ntp-data-minimization"/>). The use of the NTP service port (123) for the srcport and dstport variables is not required for all operating modes, and such unnecessary usage comes at the expense of reducing the amount of work required for an attacker to successfully perform off-path/blind attacks against NTP. Therefore, this document formally updates <xref target="RFC5905"/>, recommending the use of transport-protocol port randomization when use of the NTP service port is not required.</t>
 
 <t>This issue has been tracked by US-CERT with VU#597821, and has been assigned CVE-2019-11331.</t>
 </section>
 
 
 <section title="Acknowledgments">
+
+<t>The authors would like to thank (in alphabetical order) Ivan Arce, Todd Glassey, Watson Ladd, Aanchal Malhotra, Danny Mayer, Gary E. Miller, Tomoyuki Sahara, Dieter Sibold, Steven Sommars, and Ulrich Windl, for providing valuable comments on earlier versions of this document.</t>
+
 <t>Watson Ladd raised the problem of DDoS mitigation when the NTP service port is employed as the client port (discussed in <xref target="filtering"/> of this document).</t>
-
-<t>The authors would like to thank (in alphabetical order) Ivan Arce, Todd Glassey, Watson Ladd, Aanchal Malhotra, Danny Mayer, Gary E. Miller, Dieter Sibold, Steven Sommars, and Ulrich Windl, for providing valuable comments on earlier versions of this document.</t>
-
-
 
 <t>The authors would like to thank Harlan Stenn for answering questions about nwtime.org's NTP implementation. </t>
 
@@ -295,7 +297,7 @@ When port randomization is employed, the port number SHOULD be randomized on a p
 	<?rfc include="reference.RFC.4953" ?>
 	<?rfc include="reference.RFC.7942" ?>
 	<?rfc include="reference.I-D.ietf-ntp-data-minimization" ?>
-	<?rfc include="reference.I-D.gont-predictable-numeric-ids" ?>
+	<?rfc include="reference.I-D.irtf-pearg-numeric-ids-generation" ?>
 
 
 
