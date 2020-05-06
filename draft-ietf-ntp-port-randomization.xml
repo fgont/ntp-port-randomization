@@ -194,7 +194,7 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 
 <t>
 <list style="hanging">
-<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it SHOULD contain the NTP port number PORT (123) assigned by the IANA. In other cases, it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number of packets sent from this association. The randomized port number SHOULD NOT be shared with other associations.<!-- The port number SHOULD be selected randomly with each new request.-->
+<t>dstport: UDP port number of the client. In the case of broadcast server mode (5) and symmetric modes (1 and 2), it SHOULD contain the NTP port number PORT (123) assigned by the IANA. In the client mode (3), it SHOULD contain a randomized port number, as specified in <xref target="RFC6056"/>. The value in this variable becomes the source port number of packets sent from this association. The randomized port number SHOULD NOT be shared with other associations.<!-- The port number SHOULD be selected randomly with each new request.-->
 </t>
 
 
