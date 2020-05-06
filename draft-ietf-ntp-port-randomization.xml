@@ -132,19 +132,16 @@ the title) for use on http://www.rfc-editor.org/search.html. -->
 
 <section title="Effects on Path Selection" anchor="path-selection">
 
-<t>Intermediate systems implementing the Equal-Cost Multi-Path (ECMP) algorithm may select the outgoing link by computing a hash over a number of values, that include the transport-protocol source port. Thus, as discussed in <xref target="NTP-CHLNG"/>, the selected client port may have an influence on the measured delay and jitter values. <!-- XXX expand the discussion --> </t>
+<t>Intermediate systems implementing the Equal-Cost Multi-Path (ECMP) algorithm may select the outgoing link by computing a hash over a number of values, that include the transport-protocol source port. Thus, as discussed in <xref target="NTP-CHLNG"/>, the selected client port may have an influence on the measured offset and delay. <!-- XXX expand the discussion --> </t>
 <!--
 <t>A number of intermediate devices implement ECMP routing, selecting the outgoing link based on the result of a hash that typically takes the five-tuple that identifies a traffic "flow" (e.g., TCP connection). <xref target="NTP-CHLNG"/> notes the effect of ECMP on time synchronization. For example, two systems that synchronize their clocks with the same NTP server might end up with a significant offset between their clocks as a result of their NTP requests taking paths with very different characteristics.</t>
 -->
 
-<t>This might mean, for example, that two clients in the same network synchronized with the same NTP server using a stable source port (selected randomly or not) have a significant offset between their clocks due to their NTP exchanges taking paths with different asymmetry in the network delay.</t>
+<t>If the source port is changed with each request, packets in different exchanges will be more likely to take different paths, which could cause the measurements to be less stable and have a negative impact on the stability of the clock.</t>
 
-<t>If the clients changed their source port with each request, packets in different exchanges would take different paths. When clients change their source ports with each request, the RTT may be more variable.  Whether this improves or worsens time and frequency transfer is unpredictable. The impact on stability of the clocks would be mitigated by the clock filter algorithm, which prefers samples with shorter delay.</t>
+<t>Network paths to/from a given server are less likely to change between requests if port randomization is applied on a per-association basis. This approach minimizes the impact on the stability of NTP measurements, but may cause different clients in the same network synchronized to the same NTP server to have a significant stable offset between their clocks due to their NTP exchanges consistently taking different paths with different asymmetry in the network delay.</t>
 
-<t>On the other hand, if port-randomization is applied on a per-association basis, request/responses to the same association would likely follow the same path, since the IP addresses and transport port numbers employed for an association would not change. This would thus result in more stability of the measurements.
-</t>
-
-<t><xref target="update"/> recommends NTP implementations to randomize the ephemeral port number of non-symmetrical associations. The choice of whether to randomize the port number on a per-association or a per-request basis is left to the implementation.</t>
+<t><xref target="update"/> recommends NTP implementations to randomize the ephemeral port number of client/server associations. The choice of whether to randomize the port number on a per-association or a per-request basis is left to the implementation.</t>
 
 
 </section>
